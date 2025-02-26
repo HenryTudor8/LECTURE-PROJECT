@@ -1,11 +1,14 @@
 using System.Collections;
 using UnityEngine;
 
-public class BillionaireBase : MonoBehaviour
-{
+public class BillionaireBase : IClosest
+{ 
+    public FlagScript flagPrefab;
+    public int flagCount;
     public GameObject billionPrefab;
     public Color baseColor;
     public float spawnInterval = 3f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -26,20 +29,20 @@ public class BillionaireBase : MonoBehaviour
     // Function to spawn billion
     private void SpawnBillion()
     {
-        Debug.Log("Spawning Billion..."); // Confirms function is running
+        //Debug.Log("Spawning Billion..."); // Confirms function is running
         Vector2 spawnPosition = GetValidSpawnPosition();
 
-        Debug.Log("Calculated Spawn Position: " + spawnPosition); // Check what position is being generated
+        //Debug.Log("Calculated Spawn Position: " + spawnPosition); // Check what position is being generated
 
         if (spawnPosition != Vector2.zero)
         {
             GameObject newBillion = Instantiate(billionPrefab, spawnPosition, Quaternion.identity);
-            Debug.Log("Billion successfully spawned at: " + spawnPosition);
+            //Debug.Log("Billion successfully spawned at: " + spawnPosition);
             newBillion.GetComponent<Billions>().Initialize(baseColor);
         }
         else
         {
-            Debug.LogError("Spawn position is invalid (Vector2.zero). Check GetValidSpawnPosition()!");
+            //Debug.LogError("Spawn position is invalid (Vector2.zero). Check GetValidSpawnPosition()!");
         }
     }
 
