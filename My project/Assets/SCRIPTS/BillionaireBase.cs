@@ -1,8 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
-public class BillionaireBase : IClosest
-{ 
+public class BillionaireBase : MonoBehaviour
+{
     public FlagScript flagPrefab;
     public int flagCount;
     public GameObject billionPrefab;
@@ -12,6 +12,7 @@ public class BillionaireBase : IClosest
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        FlagController.Instance.allClickableObjects.Add(gameObject);
         // Using a Coroutine that spawns billions at set intervals
         StartCoroutine(SpawnBillionRoutine());
     }
@@ -66,6 +67,6 @@ public class BillionaireBase : IClosest
         return Vector2.zero; // If no valid position found after max attempts, return zero
     }
 }
-    
+
 
 

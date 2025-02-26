@@ -24,7 +24,7 @@ public class FlagController : MonoBehaviour
 
             GameObject closest = GetClosest(mousePosition);
 
-            if(closest.TryGetComponent<FlagScript>(out FlagScript closestFlag))
+            if (closest.TryGetComponent<FlagScript>(out FlagScript closestFlag))
             {
                 Debug.Log("Flag Found" + closestFlag);
                 closestFlag.transform.position = mousePosition;
@@ -41,7 +41,7 @@ public class FlagController : MonoBehaviour
                     Instantiate(closestBase.flagPrefab, mousePosition, Quaternion.identity);
                     closestBase.flagCount++;
                 }
-                        
+
             }
         }
     }

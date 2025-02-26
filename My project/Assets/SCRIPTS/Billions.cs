@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Billions : MonoBehaviour
 {
-    
+
     private SpriteRenderer spriteRenderer; // Reference to the SpriteRenderer component
 
     // Function to initialize the billion with the correct color
