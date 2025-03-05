@@ -8,8 +8,17 @@ public class FlagScript : MonoBehaviour
 
     void Start()
     {
+        Debug.Log($"FlagScript Start() called for {gameObject.name}");
         // Add this flag to the list of clickable objects in FlagController
         FlagController.Instance.allClickableObjects.Add(gameObject);
+        Debug.Log($"Flag added to allClickableObjects: {gameObject.name}, Color: {GetComponent<SpriteRenderer>().color}");
+
+        // Get the SpriteRenderer component
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+
+        // Set sorting layer and ensure it appears in front of billions
+        sr.sortingLayerName = "Flags";
+        sr.sortingOrder = 3; // Ensure flags render in front of billions
 
         // Initialize the Line Renderer component for visualizing movement
         lineRenderer = gameObject.AddComponent<LineRenderer>();

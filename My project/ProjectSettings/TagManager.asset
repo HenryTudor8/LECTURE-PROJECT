@@ -44,11 +44,11 @@ TagManager:
   - name: Backgrounds
     uniqueID: 104284957
     locked: 0
-  - name: Flags
-    uniqueID: 1914225875
-    locked: 0
   - name: Billions
     uniqueID: 1738682749
+    locked: 0
+  - name: Flags
+    uniqueID: 1914225875
     locked: 0
   m_RenderingLayers:
   - Default
