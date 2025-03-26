@@ -224,7 +224,7 @@ MonoBehaviour:
   flagPrefab: {fileID: -7421716990369378944, guid: eef315f780a738146b14c621a498ed32, type: 3}
   flagCount: 0
   billionPrefab: {fileID: 4796137418776304350, guid: 040b79bb40e55a543be8cbd4df779609, type: 3}
-  baseColor: {r: 0.15056597, g: 0.5018867, b: 0.15056597, a: 1}
+  baseColor: {r: 0, g: 0.58431375, b: 1, a: 1}
   spawnInterval: 3
 --- !u!50 &41098488
 Rigidbody2D:
@@ -320,6 +320,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flagLimit: 2
   allClickableObjects: []
+  allFlags: []
+  allBillions: []
 --- !u!4 &493694911
 Transform:
   m_ObjectHideFlags: 0
@@ -4094,7 +4096,7 @@ MonoBehaviour:
   flagPrefab: {fileID: -7421716990369378944, guid: 33fe1d70f128fdf4892ec68ccca5248c, type: 3}
   flagCount: 0
   billionPrefab: {fileID: 8957891496998012898, guid: 8b1a596322376524485d1808cfcf24ea, type: 3}
-  baseColor: {r: 0.6549413, g: 0.90588236, b: 0.25164112, a: 1}
+  baseColor: {r: 1, g: 0, b: 0, a: 1}
   spawnInterval: 3
 --- !u!50 &2035189597
 Rigidbody2D:

@@ -13,6 +13,7 @@ public class FlagScript : MonoBehaviour
         FlagController.Instance.allClickableObjects.Add(gameObject);
         Debug.Log($"Flag added to allClickableObjects: {gameObject.name}, Color: {GetComponent<SpriteRenderer>().color}");
 
+        FlagController.Instance.allFlags.Add(gameObject);
         // Get the SpriteRenderer component
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
 

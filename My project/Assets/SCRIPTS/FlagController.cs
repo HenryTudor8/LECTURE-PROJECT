@@ -7,6 +7,8 @@ public class FlagController : MonoBehaviour
 {
     [SerializeField] int flagLimit;
     public List<GameObject> allClickableObjects = new List<GameObject>();
+    public List<GameObject> allFlags = new List<GameObject>();
+    public List<Billions> allBillions = new List<Billions>();
     public static FlagController Instance;
     void Awake()
     {
