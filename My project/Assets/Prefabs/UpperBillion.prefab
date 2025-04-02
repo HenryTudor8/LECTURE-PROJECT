@@ -121,6 +121,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8865293537507000586}
+  - {fileID: 3427373009773280638}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8416937546495410550
@@ -253,6 +254,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d21c89ef30ed644ea44ddef84f6cd46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blasterShotPrefab: {fileID: 2460646426648789612, guid: 363857d00047b134ab64a138f1fea1c0, type: 3}
+  turretTip: {fileID: 3427373009773280638}
+  shootInterval: 1.5
+  blasterRange: 4
+  blasterDamage: 10
+  maxHealth: 30
   rb: {fileID: 3724290810975000383}
   moveSpeed: 2
   cannonObject: {fileID: 6165763219205000624}
@@ -260,3 +267,34 @@ MonoBehaviour:
   acceleration: 10
   decelerationRadius: 2
   minDistance: 0.5
+--- !u!1 &9011453482217561699
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3427373009773280638}
+  m_Layer: 0
+  m_Name: TurretTip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3427373009773280638
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9011453482217561699}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.73, y: 0, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4400211260771284245}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
