@@ -2,17 +2,17 @@ using UnityEngine;
 
 public class BaseTurret : MonoBehaviour
 {
-    [Header("References")]
+    
     public Transform turretTip;                  
     public GameObject baseProjectilePrefab;      
     public Color baseColor;                      
 
-    [Header("Targeting")]
+    
     public float rotationSpeed = 45f;            // Degrees per second
     private Billions currentTarget;              // The nearest opposing Billion
     public float detectionRange = 100f;          
 
-    [Header("Firing Settings")]
+    
     public float fireInterval = 2.5f;            // Different from Billions' 1.5f
     private float fireTimer = 0f;
     public float projectileDamage = 15f;         // Different from Billions' 10f
