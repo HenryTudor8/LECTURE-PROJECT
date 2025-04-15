@@ -8,6 +8,9 @@ public class BillionaireBase : MonoBehaviour
     public GameObject billionPrefab;
     public Color baseColor;
     public float spawnInterval = 3f;
+    [SerializeField] float maxHealth = 100f;
+    private float currentHealth;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -15,6 +18,17 @@ public class BillionaireBase : MonoBehaviour
         FlagController.Instance.allClickableObjects.Add(gameObject);
         // Using a Coroutine that spawns billions at set intervals
         StartCoroutine(SpawnBillionRoutine());
+
+        FlagController.Instance.RegisterBase(this);
+
+        currentHealth = maxHealth;
+
+
+    }
+    private void Awake()
+    {
+        FlagController.Instance.RegisterBase(this);
+
     }
 
     //The Coroutine itself
@@ -66,6 +80,22 @@ public class BillionaireBase : MonoBehaviour
 
         return Vector2.zero; // If no valid position found after max attempts, return zero
     }
+    public void TakeDamage(float amount)
+    {
+        currentHealth -= amount;
+        Debug.Log($"Base {name} took {amount} damage. Health now: {currentHealth}");
+
+        if (currentHealth <= 0)
+        {
+            Destroy(gameObject); // Destroy the base when health reaches 0
+        }
+        /*if (radialBar != null)
+        {
+            radialBar.SetHealthPercent(currentHealth / maxHealth);
+        }*/
+
+    }
+
 }
 
 

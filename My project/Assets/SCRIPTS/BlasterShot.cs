@@ -70,5 +70,13 @@ public class BlasterShot : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        else if (other.TryGetComponent<BillionaireBase>(out BillionaireBase baseTarget))
+        {
+            if (baseTarget.baseColor != shotColor)
+            {
+                baseTarget.TakeDamage(damage);
+                Destroy(gameObject);
+            }
+        }
     }
 }

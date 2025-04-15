@@ -9,6 +9,18 @@ public class FlagController : MonoBehaviour
     public List<GameObject> allClickableObjects = new List<GameObject>();
     public List<GameObject> allFlags = new List<GameObject>();
     public List<Billions> allBillions = new List<Billions>();
+    public List<BillionaireBase> allBases = new List<BillionaireBase>(); // added for handling FireAtClosestTarget in billions script
+
+
+    public void RegisterBase(BillionaireBase baseObj)
+    {
+        if (!allBases.Contains(baseObj))
+        {
+            allBases.Add(baseObj);
+        }
+    }
+
+
     public static FlagController Instance;
     void Awake()
     {

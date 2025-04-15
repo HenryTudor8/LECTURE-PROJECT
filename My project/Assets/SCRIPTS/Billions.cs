@@ -32,6 +32,10 @@ public class Billions : MonoBehaviour
     public float decelerationRadius = 2f; // Distance at which to begin slowing down
     public float minDistance = 0.5f;     // Stop moving when within this distance
 
+    private GameObject currentTarget; // Could be an enemy base or billion
+
+
+
 
     private void Awake()
     {
@@ -67,12 +71,13 @@ public class Billions : MonoBehaviour
 
         transform.position = Vector3.MoveTowards(transform.position, targetFlag.transform.position, Time.deltaTime * moveSpeed);
 
-        LookAtClosestBillion();
+        //LookAtClosestBillion();
+        FindClosestTarget();
 
         TryShootAtEnemy(); // To validate billion firing a blaster
     }
 
-    private void LookAtClosestBillion()
+    /*private void LookAtClosestBillion()
     {
         Billions nearestBillion = null;
         float nearestDistance = Mathf.Infinity;
@@ -109,7 +114,51 @@ public class Billions : MonoBehaviour
             currentTargetEnemy = null;
         }
 
+    } */
+  // New method added in place of LookAtClosestBillion
+    private void FindClosestTarget()
+    {
+        float closestDistance = Mathf.Infinity;
+        GameObject bestTarget = null;
+
+        // Check enemy billions
+        foreach (Billions b in FlagController.Instance.allBillions)
+        {
+            if (b == this) continue; // Skip self
+            if (b.GetComponent<SpriteRenderer>().color == myColor) continue; // Skip friendlies
+
+            float dist = Vector2.Distance(transform.position, b.transform.position);
+            if (dist < closestDistance)
+            {
+                closestDistance = dist;
+                bestTarget = b.gameObject;
+            }
+        }
+
+        // Check enemy bases
+        foreach (BillionaireBase baseObj in FlagController.Instance.allBases)
+        {
+            if (baseObj.baseColor == myColor) continue; // Skip friendlies
+
+            float dist = Vector2.Distance(transform.position, baseObj.transform.position);
+            if (dist < closestDistance)
+            {
+                closestDistance = dist;
+                bestTarget = baseObj.gameObject;
+            }
+        }
+
+        currentTarget = bestTarget;
+
+        // Rotate to face the target
+        if (currentTarget != null)
+        {
+            Vector3 diff = currentTarget.transform.position - transform.position;
+            float angle = Mathf.Atan2(diff.y, diff.x);
+            transform.rotation = Quaternion.Euler(0f, 0f, angle * Mathf.Rad2Deg);
+        }
     }
+
 
     private FlagScript FindNearestFlagOfSameColor()
     {
