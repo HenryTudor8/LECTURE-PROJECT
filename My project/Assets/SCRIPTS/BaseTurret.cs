@@ -38,14 +38,16 @@ public class BaseTurret : MonoBehaviour
         currentTarget = null;
         float nearestDistance = Mathf.Infinity;
 
-        // Check all Billions in the scene 
         foreach (Billions billion in FlagController.Instance.allBillions)
         {
-            // Skip same-colored Billions 
+            // ? Skip if the object has been destroyed
+            if (billion == null || billion.gameObject == null)
+                continue;
+
+            // ? Skip if this is a friendly billion
             if (billion.GetComponent<SpriteRenderer>().color == baseColor)
                 continue;
 
-            // Distance check
             float dist = Vector2.Distance(transform.position, billion.transform.position);
             if (dist < nearestDistance && dist < detectionRange)
             {
@@ -53,6 +55,7 @@ public class BaseTurret : MonoBehaviour
                 currentTarget = billion;
             }
         }
+
     }
 
     private void RotateTowardTarget(Vector3 targetPos)

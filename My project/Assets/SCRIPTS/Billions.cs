@@ -7,7 +7,7 @@ public class Billions : MonoBehaviour
 {
 
     private SpriteRenderer spriteRenderer;
-    private Billions currentTargetEnemy; // refactored closest enemy from LookAtClosestBillion
+    // private Billions currentTargetEnemy; // refactored closest enemy from LookAtClosestBillion
 
     // Blaster shooting
     [SerializeField] GameObject blasterShotPrefab;
@@ -194,20 +194,22 @@ public class Billions : MonoBehaviour
     {
         shootTimer += Time.deltaTime;
 
-        if (currentTargetEnemy == null) return; // Prevent accessing destroyed targets
+        // If the target is gone or destroyed, don't shoot
+        if (currentTarget == null) return;
 
-        float distance = Vector2.Distance(transform.position, currentTargetEnemy.transform.position);
+        float distance = Vector2.Distance(transform.position, currentTarget.transform.position);
+
         if (distance <= blasterRange && shootTimer >= shootInterval)
         {
             shootTimer = 0f;
 
-            // Instantiate blaster shot
             GameObject blaster = Instantiate(blasterShotPrefab, turretTip.position, turretTip.rotation);
-
             BlasterShot blasterScript = blaster.GetComponent<BlasterShot>();
+
             blasterScript.Initialize(myColor, transform.up, blasterDamage, gameObject);
         }
     }
+
 
 
     public void TakeDamage(float amount)
@@ -217,6 +219,14 @@ public class Billions : MonoBehaviour
         if (currentHealth <= 0)
         {
             Destroy(gameObject); // Remove Billion from game
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (FlagController.Instance != null)
+        {
+            FlagController.Instance.allBillions.Remove(this);
         }
     }
 

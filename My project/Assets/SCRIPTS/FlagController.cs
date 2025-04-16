@@ -11,6 +11,9 @@ public class FlagController : MonoBehaviour
     public List<Billions> allBillions = new List<Billions>();
     public List<BillionaireBase> allBases = new List<BillionaireBase>(); // added for handling FireAtClosestTarget in billions script
 
+    
+
+
 
     public void RegisterBase(BillionaireBase baseObj)
     {
@@ -24,8 +27,16 @@ public class FlagController : MonoBehaviour
     public static FlagController Instance;
     void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); // Prevent duplicates
+        }
     }
+
 
     // Update is called once per frame
     void Update()

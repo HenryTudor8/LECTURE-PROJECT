@@ -11,6 +11,10 @@ public class BillionaireBase : MonoBehaviour
     [SerializeField] float maxHealth = 100f;
     private float currentHealth;
 
+    public GameObject radialHealthBarPrefab;
+    private RadialHealthBar radialBar;
+
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,12 +26,28 @@ public class BillionaireBase : MonoBehaviour
         FlagController.Instance.RegisterBase(this);
 
         currentHealth = maxHealth;
+        void Start()
+        {
+            currentHealth = maxHealth;
+
+            if (radialHealthBarPrefab != null)
+            {
+                GameObject barInstance = Instantiate(radialHealthBarPrefab, transform.position, Quaternion.identity, transform);
+                radialBar = barInstance.GetComponentInChildren<RadialHealthBar>();
+                radialBar.SetHealthPercent(1f);
+            }
+
+            FlagController.Instance.RegisterBase(this);
+            FlagController.Instance.allClickableObjects.Add(gameObject);
+            StartCoroutine(SpawnBillionRoutine());
+        }
+
 
 
     }
     private void Awake()
     {
-        FlagController.Instance.RegisterBase(this);
+        //FlagController.Instance.RegisterBase(this);
 
     }
 
@@ -93,6 +113,12 @@ public class BillionaireBase : MonoBehaviour
         {
             radialBar.SetHealthPercent(currentHealth / maxHealth);
         }*/
+
+        if (radialBar != null)
+        {
+            float healthPercent = currentHealth / maxHealth;
+            radialBar.SetHealthPercent(healthPercent);
+        }
 
     }
 
