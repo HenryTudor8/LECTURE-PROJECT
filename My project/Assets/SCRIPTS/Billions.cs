@@ -138,6 +138,8 @@ public class Billions : MonoBehaviour
         // Check enemy bases
         foreach (BillionaireBase baseObj in FlagController.Instance.allBases)
         {
+            if (baseObj == null) continue;
+
             if (baseObj.baseColor == myColor) continue; // Skip friendlies
 
             float dist = Vector2.Distance(transform.position, baseObj.transform.position);

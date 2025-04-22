@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BaseTurret : MonoBehaviour
 {
@@ -40,11 +40,11 @@ public class BaseTurret : MonoBehaviour
 
         foreach (Billions billion in FlagController.Instance.allBillions)
         {
-            // ? Skip if the object has been destroyed
+            // ✅ Skip if the object has been destroyed
             if (billion == null || billion.gameObject == null)
                 continue;
 
-            // ? Skip if this is a friendly billion
+            // ✅ Skip if this is a friendly billion
             if (billion.GetComponent<SpriteRenderer>().color == baseColor)
                 continue;
 

@@ -11,40 +11,38 @@ public class BillionaireBase : MonoBehaviour
     [SerializeField] float maxHealth = 100f;
     private float currentHealth;
 
-    public GameObject radialHealthBarPrefab;
-    private RadialHealthBar radialBar;
+    public GameObject baseHealthRingPrefab;
+    private BaseHealthRing healthRing;        // cached reference
+
 
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        FlagController.Instance.allClickableObjects.Add(gameObject);
-        // Using a Coroutine that spawns billions at set intervals
-        StartCoroutine(SpawnBillionRoutine());
-
-        FlagController.Instance.RegisterBase(this);
-
         currentHealth = maxHealth;
-        void Start()
+
+        if (baseHealthRingPrefab != null)
         {
-            currentHealth = maxHealth;
+            // Slight upward offset so the ring isn't hidden by the base sprite
+            Vector3 offset = new Vector3(0f, 0.05f, 0f);
+            GameObject ringObj = Instantiate(
+                baseHealthRingPrefab,
+                transform.position + offset,
+                Quaternion.identity,
+                transform);                 // parent to the base
 
-            if (radialHealthBarPrefab != null)
-            {
-                GameObject barInstance = Instantiate(radialHealthBarPrefab, transform.position, Quaternion.identity, transform);
-                radialBar = barInstance.GetComponentInChildren<RadialHealthBar>();
-                radialBar.SetHealthPercent(1f);
-            }
-
-            FlagController.Instance.RegisterBase(this);
-            FlagController.Instance.allClickableObjects.Add(gameObject);
-            StartCoroutine(SpawnBillionRoutine());
+            healthRing = ringObj.GetComponent<BaseHealthRing>();
+            if (healthRing != null)
+                healthRing.SetFill(1f);
         }
 
-
-
+        // existing setup
+        FlagController.Instance.RegisterBase(this);
+        FlagController.Instance.allClickableObjects.Add(gameObject);
+        StartCoroutine(SpawnBillionRoutine());
     }
+
     private void Awake()
     {
         //FlagController.Instance.RegisterBase(this);
@@ -103,24 +101,27 @@ public class BillionaireBase : MonoBehaviour
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
-        Debug.Log($"Base {name} took {amount} damage. Health now: {currentHealth}");
+        Debug.Log($"[Damage] {name} {currentHealth}/{maxHealth}");
+
+        if (healthRing != null)
+            healthRing.SetFill(currentHealth / maxHealth);
 
         if (currentHealth <= 0)
         {
-            Destroy(gameObject); // Destroy the base when health reaches 0
-        }
-        /*if (radialBar != null)
-        {
-            radialBar.SetHealthPercent(currentHealth / maxHealth);
-        }*/
+            if (healthRing != null)
+                Destroy(healthRing.gameObject);
 
-        if (radialBar != null)
-        {
-            float healthPercent = currentHealth / maxHealth;
-            radialBar.SetHealthPercent(healthPercent);
+            Destroy(gameObject);
         }
-
     }
+
+    void OnDestroy()
+    {
+        if (FlagController.Instance != null)
+            FlagController.Instance.allBases.Remove(this);
+    }
+
+
 
 }
 
