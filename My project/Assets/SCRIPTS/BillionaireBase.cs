@@ -1,56 +1,60 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class BillionaireBase : MonoBehaviour
 {
+    /* ──────────────  XP / Rank fields  ────────────── */
+    public int rank = 1;      // starts at 1
+    public int xp = 0;      // running XP
+    public int xpThreshold = 20;     // first level-up need
+    public float thresholdGrowth = 1.5f;   // nextThreshold = old * growth
+
+    /* XP visual ring (white) */
+    public SpriteRenderer xpRingRenderer;          // drag in Inspector
+    private Vector3 xpRingInitialScale;
+
+    /* ──────────────  Existing fields  ────────────── */
     public FlagScript flagPrefab;
     public int flagCount;
     public GameObject billionPrefab;
     public Color baseColor;
     public float spawnInterval = 3f;
+
     [SerializeField] float maxHealth = 100f;
     private float currentHealth;
 
     public GameObject baseHealthRingPrefab;
-    private BaseHealthRing healthRing;        // cached reference
+    private BaseHealthRing healthRing;
 
-
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    /* ─────────────────────────────────────────────── */
     void Start()
     {
         currentHealth = maxHealth;
 
+        /* cache XP-ring scale */
+        if (xpRingRenderer != null)
+            xpRingInitialScale = xpRingRenderer.transform.localScale;
+
+        /* health ring */
         if (baseHealthRingPrefab != null)
         {
-            // Slight upward offset so the ring isn't hidden by the base sprite
             Vector3 offset = new Vector3(0f, 0.05f, 0f);
-            GameObject ringObj = Instantiate(
-                baseHealthRingPrefab,
-                transform.position + offset,
-                Quaternion.identity,
-                transform);                 // parent to the base
+            GameObject ring = Instantiate(baseHealthRingPrefab,
+                                          transform.position + offset,
+                                          Quaternion.identity,
+                                          transform);
 
-            healthRing = ringObj.GetComponent<BaseHealthRing>();
-            if (healthRing != null)
-                healthRing.SetFill(1f);
+            healthRing = ring.GetComponent<BaseHealthRing>();
+            healthRing?.SetFill(1f);
         }
 
-        // existing setup
         FlagController.Instance.RegisterBase(this);
         FlagController.Instance.allClickableObjects.Add(gameObject);
         StartCoroutine(SpawnBillionRoutine());
     }
 
-    private void Awake()
-    {
-        //FlagController.Instance.RegisterBase(this);
-
-    }
-
-    //The Coroutine itself
-    private IEnumerator SpawnBillionRoutine()
+    /* ───────── spawn loop ───────── */
+    IEnumerator SpawnBillionRoutine()
     {
         while (true)
         {
@@ -59,58 +63,27 @@ public class BillionaireBase : MonoBehaviour
         }
     }
 
-    // Function to spawn billion
-    private void SpawnBillion()
+    void SpawnBillion()
     {
-        //Debug.Log("Spawning Billion..."); // Confirms function is running
-        Vector2 spawnPosition = GetValidSpawnPosition();
+        Vector2 spawnPos = GetValidSpawnPosition();
+        if (spawnPos == Vector2.zero) return;
 
-        //Debug.Log("Calculated Spawn Position: " + spawnPosition); // Check what position is being generated
-
-        if (spawnPosition != Vector2.zero)
-        {
-            GameObject newBillion = Instantiate(billionPrefab, spawnPosition, Quaternion.identity);
-            //Debug.Log("Billion successfully spawned at: " + spawnPosition);
-            newBillion.GetComponent<Billions>().Initialize(baseColor);
-        }
-        else
-        {
-            //Debug.LogError("Spawn position is invalid (Vector2.zero). Check GetValidSpawnPosition()!");
-        }
+        GameObject g = Instantiate(billionPrefab, spawnPos, Quaternion.identity);
+        Billions b = g.GetComponent<Billions>();
+        b.Initialize(baseColor, this);                  // pass THIS base
     }
 
-
-    // Finding a non-overlapping spawn position
-    private Vector2 GetValidSpawnPosition()
-    {
-        int maxAttempts = 10; // Maximum number of attempts to find a valid position
-
-        for (int i = 0; i < maxAttempts; i++)
-        {
-            // Generate a random small offset from the base position
-            Vector2 randomOffset = Random.insideUnitCircle * 3.0f;
-            Vector2 spawnPos = (Vector2)transform.position + randomOffset;
-
-            // Check if there are any colliders in this position
-            Collider2D hit = Physics2D.OverlapCircle(spawnPos, 0.2f);
-            if (!hit) return spawnPos; // If no collisions, return this as a valid spawn position
-        }
-
-        return Vector2.zero; // If no valid position found after max attempts, return zero
-    }
+    /* ───────── damage / destroy ───────── */
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
+        healthRing?.SetFill(currentHealth / maxHealth);
+
         Debug.Log($"[Damage] {name} {currentHealth}/{maxHealth}");
 
-        if (healthRing != null)
-            healthRing.SetFill(currentHealth / maxHealth);
-
-        if (currentHealth <= 0)
+        if (currentHealth <= 0f)
         {
-            if (healthRing != null)
-                Destroy(healthRing.gameObject);
-
+            if (healthRing) Destroy(healthRing.gameObject);
             Destroy(gameObject);
         }
     }
@@ -121,9 +94,48 @@ public class BillionaireBase : MonoBehaviour
             FlagController.Instance.allBases.Remove(this);
     }
 
+    /* ───────── XP / Rank logic ───────── */
+    public void AddExperience(int amount)
+    {
+        xp += amount;
 
+        if (xpRingRenderer != null)
+        {
+            float p = (float)xp / xpThreshold;
+            xpRingRenderer.transform.localScale =
+                xpRingInitialScale * Mathf.Clamp01(p);
+        }
 
+        while (xp >= xpThreshold)
+        {
+            xp -= xpThreshold;
+            RankUp();
+        }
+    }
+
+    void RankUp()
+    {
+        rank++;
+        xpThreshold = Mathf.CeilToInt(xpThreshold * thresholdGrowth);
+        Debug.Log($"[RankUp] {name} → Rank {rank}  (next {xpThreshold})");
+
+        if (xpRingRenderer != null)
+            xpRingRenderer.transform.localScale = Vector3.zero;
+        /* optional: update a rank label here */
+    }
+
+    /* ───────── helpers ───────── */
+    Vector2 GetValidSpawnPosition()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            Vector2 pos = (Vector2)transform.position + Random.insideUnitCircle * 3f;
+            if (!Physics2D.OverlapCircle(pos, 0.2f)) return pos;
+        }
+        return Vector2.zero;
+    }
 }
+
 
 
 

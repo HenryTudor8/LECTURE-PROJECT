@@ -1,82 +1,78 @@
 using UnityEngine;
 
-
-
+[RequireComponent(typeof(SpriteRenderer))]
 public class BlasterShot : MonoBehaviour
 {
-    
+    [Header("Runtime")]
+    public Vector2 direction;
     public float speed = 6f;
+    public float damage;
+    public float maxTravelDistance = 12f;
+    public Color shotColor;
 
-    
-    public float maxTravelDistance = 8f;
+    public GameObject shooter;            // who fired
+    public BillionaireBase ownerBase;     // which base owns the projectile
 
-    
-    private Vector3 startPosition;
+    private Vector3 spawnPos;
 
-    
-    private Vector3 direction;
-
-   
-    private float damage;
-
-    
-    private Color shotColor;
-
-    
-    private GameObject owner;
-
-
-    public void Initialize(Color color, Vector3 dir, float dmg, GameObject shooter)
+    // ---------- INITIALISE ----------
+    public void Initialize(Color c, Vector2 dir, float dmg, GameObject s)
     {
-        shotColor = color;
-        direction = dir.normalized; // Ensure direction is a unit vector
+        shotColor = c;
+        direction = dir.normalized;
         damage = dmg;
-        owner = shooter;
-        startPosition = transform.position;
+        shooter = s;
 
-        // Set the sprite color to match the shooter's color
+        // resolve owner base (projectile may come from a billion or a base-turret)
+        ownerBase = s.GetComponent<BillionaireBase>();
+        if (ownerBase == null)
+            ownerBase = s.GetComponent<Billions>()?.ownerBase;
+
         GetComponent<SpriteRenderer>().color = shotColor;
+        spawnPos = transform.position;
     }
 
-
-    // Update is called once per frame
+    // ---------- UPDATE ----------
     void Update()
     {
-        transform.position += direction * speed * Time.deltaTime;
+        transform.position += (Vector3)direction * speed * Time.deltaTime;
 
-        // Destroy the blaster if it exceeds its travel distance
-        if (Vector3.Distance(startPosition, transform.position) > maxTravelDistance)
-        {
+        if (Vector3.Distance(spawnPos, transform.position) >= maxTravelDistance)
             Destroy(gameObject);
-        }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    // ---------- COLLISION ----------
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject == owner)
-            return;
+        // ignore self
+        if (other.gameObject == shooter) return;
 
-        // Check if we hit another Billion
-        if (other.TryGetComponent<Billions>(out Billions target))
+        // hit enemy billion
+        if (other.TryGetComponent(out Billions targetBillion))
         {
-            // Only damage if it's an enemy (different color)
-            if (target.GetComponent<SpriteRenderer>().color != shotColor)
+            if (targetBillion.ownerBase != ownerBase)   // enemy?
             {
-                target.TakeDamage(damage); // Call method to reduce health
-                Destroy(gameObject); // Blaster is destroyed on hit
+                bool killed = targetBillion.TakeDamage(damage);
+                if (killed && ownerBase != null)
+                    ownerBase.AddExperience(5);          // award XP
+                Destroy(gameObject);
             }
+            return;
         }
-        else if (other.CompareTag("Wall"))
+
+        // hit enemy base
+        if (other.TryGetComponent(out BillionaireBase targetBase))
         {
-            Destroy(gameObject);
-        }
-        else if (other.TryGetComponent<BillionaireBase>(out BillionaireBase baseTarget))
-        {
-            if (baseTarget.baseColor != shotColor)
+            if (targetBase != ownerBase)
             {
-                baseTarget.TakeDamage(damage);
+                targetBase.TakeDamage(damage);
                 Destroy(gameObject);
             }
         }
+
+        // walls / others
+        if (other.gameObject.layer == LayerMask.NameToLayer("Walls"))
+            Destroy(gameObject);
     }
 }
+

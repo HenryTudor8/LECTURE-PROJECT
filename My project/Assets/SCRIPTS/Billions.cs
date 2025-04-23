@@ -1,239 +1,140 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Billions : MonoBehaviour
 {
+    /* ───────── Rank-based stats ───────── */
+    public BillionaireBase ownerBase;   // set on spawn
+    public int rank;
+    public float currentHealth;
+    public float blasterDamage;
 
+    /* ───────── Existing fields (unchanged) ───────── */
     private SpriteRenderer spriteRenderer;
-    // private Billions currentTargetEnemy; // refactored closest enemy from LookAtClosestBillion
 
-    // Blaster shooting
+    [Header("Blaster")]
     [SerializeField] GameObject blasterShotPrefab;
     [SerializeField] Transform turretTip;
     [SerializeField] float shootInterval = 1.5f;
     [SerializeField] float blasterRange = 4f;
-    [SerializeField] float blasterDamage = 10f;
-    //
 
-    //Adding Billion Health
-    [SerializeField] float maxHealth = 30f;
-    private float currentHealth;
-
+    [Header("Movement")]
     [SerializeField] Rigidbody2D rb;
-    [SerializeField] float moveSpeed = 2;
-    [SerializeField] GameObject cannonObject;
+    [SerializeField] float moveSpeed = 2f;
+
+    /* misc */
     private Color myColor;
-    private float shootTimer = 0f;
-    [Header("Movement Settings")]
-    public float maxSpeed = 5f;          // Maximum movement speed
-    public float acceleration = 10f;     // Acceleration rate
-    public float decelerationRadius = 2f; // Distance at which to begin slowing down
-    public float minDistance = 0.5f;     // Stop moving when within this distance
+    private float shootTimer;
+    private GameObject currentTarget;
 
-    private GameObject currentTarget; // Could be an enemy base or billion
-
-
-
-
-    private void Awake()
+    /* ───────── INITIALISE ───────── */
+    public void Initialize(Color color, BillionaireBase myBase)
     {
-        currentHealth = maxHealth; 
-    }
-
-    void Start()
-    {
-        FlagController.Instance.allBillions.Add(this);
-    }
-    /// <summary>
-    /// Called by BillionaireBase when spawning a Billion.
-    /// This assigns the correct color to the Billion.
-    /// </summary>
-    public void Initialize(Color color)
-    {
-        // Ensure the sprite renderer exists
         spriteRenderer = GetComponent<SpriteRenderer>();
-
-        // Assign the correct color
         spriteRenderer.color = color;
 
-        // Cache the color for movement logic
+        ownerBase = myBase;
+        rank = myBase.rank;
+
+        currentHealth = rank * 2.5f;      // formula from spec
+        blasterDamage = rank * 0.5f;
         myColor = color;
     }
 
-
+    /* ───────── FixedUpdate (movement / aim / shoot) ───────── */
     void FixedUpdate()
     {
-        // 1. Find the nearest flag of the same color
-        FlagScript targetFlag = FindNearestFlagOfSameColor();
-        if (targetFlag == null) return; // No flag found, do nothing
+        FlagScript flag = FindNearestFlagOfSameColor();
+        if (flag == null) return;
 
-        transform.position = Vector3.MoveTowards(transform.position, targetFlag.transform.position, Time.deltaTime * moveSpeed);
+        transform.position = Vector3.MoveTowards(
+            transform.position, flag.transform.position,
+            Time.deltaTime * moveSpeed);
 
-        //LookAtClosestBillion();
         FindClosestTarget();
-
-        TryShootAtEnemy(); // To validate billion firing a blaster
+        TryShootAtTarget();
     }
 
-    /*private void LookAtClosestBillion()
-    {
-        Billions nearestBillion = null;
-        float nearestDistance = Mathf.Infinity;
-
-        foreach (Billions billion in FlagController.Instance.allBillions)
-        {
-            if (!billion.GetComponent<SpriteRenderer>().color.Equals(myColor))
-            {
-                float dist = Vector2.Distance(transform.position, billion.transform.position);
-                if (dist < nearestDistance)
-                {
-                    nearestDistance = dist;
-                    nearestBillion = billion;
-                }
-            }
-        }
-        if (nearestBillion != null)
-        {
-            //What is the difference in position?
-            Vector3 diff = (nearestBillion.transform.position - transform.position);
-
-            //We use aTan2 since it handles negative numbers and division by zero errors. 
-            float angle = Mathf.Atan2(diff.y, diff.x);
-
-            //Now we set our new rotation. 
-            transform.rotation = Quaternion.Euler(0f, 0f, angle * Mathf.Rad2Deg);
-
-            // storing the target so TryShootAtEnemy can use it
-
-            currentTargetEnemy = nearestBillion;
-        }
-        else
-        {
-            currentTargetEnemy = null;
-        }
-
-    } */
-  // New method added in place of LookAtClosestBillion
+    /* ───────── Targeting helpers (unchanged logic + null guards) ───────── */
     private void FindClosestTarget()
     {
-        float closestDistance = Mathf.Infinity;
-        GameObject bestTarget = null;
+        float closest = Mathf.Infinity;
+        GameObject best = null;
 
-        // Check enemy billions
         foreach (Billions b in FlagController.Instance.allBillions)
         {
-            if (b == this) continue; // Skip self
-            if (b.GetComponent<SpriteRenderer>().color == myColor) continue; // Skip friendlies
+            if (b == null || b == this) continue;
+            if (b.myColor == myColor) continue;
 
-            float dist = Vector2.Distance(transform.position, b.transform.position);
-            if (dist < closestDistance)
-            {
-                closestDistance = dist;
-                bestTarget = b.gameObject;
-            }
+            float d = Vector2.Distance(transform.position, b.transform.position);
+            if (d < closest) { closest = d; best = b.gameObject; }
         }
 
-        // Check enemy bases
-        foreach (BillionaireBase baseObj in FlagController.Instance.allBases)
+        foreach (BillionaireBase bb in FlagController.Instance.allBases)
         {
-            if (baseObj == null) continue;
-
-            if (baseObj.baseColor == myColor) continue; // Skip friendlies
-
-            float dist = Vector2.Distance(transform.position, baseObj.transform.position);
-            if (dist < closestDistance)
-            {
-                closestDistance = dist;
-                bestTarget = baseObj.gameObject;
-            }
+            if (bb == null || bb.baseColor == myColor) continue;
+            float d = Vector2.Distance(transform.position, bb.transform.position);
+            if (d < closest) { closest = d; best = bb.gameObject; }
         }
 
-        currentTarget = bestTarget;
+        currentTarget = best;
 
-        // Rotate to face the target
         if (currentTarget != null)
         {
             Vector3 diff = currentTarget.transform.position - transform.position;
-            float angle = Mathf.Atan2(diff.y, diff.x);
-            transform.rotation = Quaternion.Euler(0f, 0f, angle * Mathf.Rad2Deg);
+            float ang = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, ang);
         }
     }
-
 
     private FlagScript FindNearestFlagOfSameColor()
     {
-        FlagScript nearestFlag = null;
-        float nearestDistance = Mathf.Infinity;
-
-        foreach (GameObject flag in FlagController.Instance.allFlags)
+        float min = Mathf.Infinity;
+        FlagScript best = null;
+        foreach (GameObject f in FlagController.Instance.allFlags)
         {
-            if (flag.GetComponent<SpriteRenderer>().color.Equals(myColor))
-            {
-                float dist = Vector2.Distance(transform.position, flag.transform.position);
-                if (dist < nearestDistance)
-                {
-                    nearestDistance = dist;
-                    nearestFlag = flag.GetComponent<FlagScript>();
-                }
-            }
+            if (f.GetComponent<SpriteRenderer>().color != myColor) continue;
+            float d = Vector2.Distance(transform.position, f.transform.position);
+            if (d < min) { min = d; best = f.GetComponent<FlagScript>(); }
         }
-
-        if (nearestFlag != null)
-        {
-            //Debug.Log($"Billion ({myColor}) found nearest flag at {nearestFlag.transform.position}");
-        }
-        else
-        {
-            //Debug.LogWarning($"Billion ({myColor}) could not find any flag!");
-        }
-
-        return nearestFlag;
+        return best;
     }
 
-    private void TryShootAtEnemy()
+    /* ───────── Shooting ───────── */
+    void TryShootAtTarget()
     {
         shootTimer += Time.deltaTime;
-
-        // If the target is gone or destroyed, don't shoot
         if (currentTarget == null) return;
 
-        float distance = Vector2.Distance(transform.position, currentTarget.transform.position);
-
-        if (distance <= blasterRange && shootTimer >= shootInterval)
+        if (Vector2.Distance(transform.position, currentTarget.transform.position) <= blasterRange &&
+            shootTimer >= shootInterval)
         {
             shootTimer = 0f;
-
-            GameObject blaster = Instantiate(blasterShotPrefab, turretTip.position, turretTip.rotation);
-            BlasterShot blasterScript = blaster.GetComponent<BlasterShot>();
-
-            blasterScript.Initialize(myColor, transform.up, blasterDamage, gameObject);
+            GameObject g = Instantiate(blasterShotPrefab, turretTip.position, turretTip.rotation);
+            g.GetComponent<BlasterShot>()
+             .Initialize(myColor, transform.up, blasterDamage, gameObject);
         }
     }
 
-
-
-    public void TakeDamage(float amount)
+    /* ───────── Damage ───────── */
+    public bool TakeDamage(float amount)
     {
         currentHealth -= amount;
-
-        if (currentHealth <= 0)
+        if (currentHealth <= 0f)
         {
-            Destroy(gameObject); // Remove Billion from game
+            Destroy(gameObject);
+            return true;   // killed
         }
+        return false;
     }
 
     void OnDestroy()
     {
         if (FlagController.Instance != null)
-        {
             FlagController.Instance.allBillions.Remove(this);
-        }
     }
-
-
-
 }
 
 
