@@ -48,6 +48,11 @@ public class BillionaireBase : MonoBehaviour
             healthRing?.SetFill(1f);
         }
 
+        // set main sprite render order (to show above floor/walls)
+        var sr = GetComponentInChildren<SpriteRenderer>();
+        if (sr != null) sr.sortingOrder = 3;
+
+
         FlagController.Instance.RegisterBase(this);
         FlagController.Instance.allClickableObjects.Add(gameObject);
         StartCoroutine(SpawnBillionRoutine());
