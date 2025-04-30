@@ -648,7 +648,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 1050671783, guid: 772d1e607ee240444a332d94612d964f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -872,6 +872,60 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1015068069
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1015068071}
+  - component: {fileID: 1015068070}
+  m_Layer: 0
+  m_Name: LevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1015068070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015068069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 734640bf65c641b498dd1040b7e50998, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 60
+  height: 34
+  floorSprite: {fileID: 1304329097595725364, guid: da8b4a1d95ab9af4b8cce9692781d9f9, type: 3}
+  wallSprite: {fileID: -5171445006971495017, guid: da8b4a1d95ab9af4b8cce9692781d9f9, type: 3}
+  wallPhysicsMaterial: {fileID: 0}
+  basePrefab: {fileID: 5669458792495920968, guid: 7075d76495e3def40bee51334192ce1c, type: 3}
+  wallChance: 0.18
+  smoothIterations: 3
+  minBaseDistance: 12
+  seed: 0
+--- !u!4 &1015068071
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015068069}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.6, y: -2.13, z: -0.048396666}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1482568813
 GameObject:
   m_ObjectHideFlags: 0
@@ -4564,7 +4618,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 5206372450948694970, guid: 0c0f371d7f74d6e4fa04cb9fca0ad3c3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -4788,6 +4842,10 @@ PrefabInstance:
       propertyPath: radialHealthBarPrefab
       value: 
       objectReference: {fileID: 8548980841458788681, guid: 54ddf6a9e270d8746a27ef8bc1d9848c, type: 3}
+    - target: {fileID: 4226023669161500095, guid: 84d7914d4baf2724c9c25892d7c4f091, type: 3}
+      propertyPath: m_SortingOrder
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4857,6 +4915,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8310987823514202929, guid: 7075d76495e3def40bee51334192ce1c, type: 3}
+      propertyPath: m_SortingOrder
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4874,3 +4936,4 @@ SceneRoots:
   - {fileID: 124533208051607003}
   - {fileID: 762494235}
   - {fileID: 493694911}
+  - {fileID: 1015068071}

@@ -2,9 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// Generates a contiguous cave-style arena and places four bases
-/// (Red, Blue, Red, Blue) every time the scene loads.
-/// ▶  Press **R** in Play Mode to reload and see a new layout.
+
 public class ProceduralLevel : MonoBehaviour
 {
     /* ─────────────  Inspector fields  ───────────── */
@@ -12,16 +10,16 @@ public class ProceduralLevel : MonoBehaviour
     public int width = 60;
     public int height = 34;
 
-    [Header("Sprites (no prefabs needed)")]
-    public Sprite floorSprite;                      // drag tile sprite here
-    public Sprite wallSprite;                       // drag wall sprite here
-    public PhysicsMaterial2D wallPhysicsMaterial;   // optional, can stay None
+    
+    public Sprite floorSprite;                      
+    public Sprite wallSprite;                       
+    public PhysicsMaterial2D wallPhysicsMaterial;   
 
-    [Header("Base prefab")]
-    public GameObject basePrefab;                   // existing BillionaireBase
+    
+    public GameObject basePrefab;                   
 
-    [Header("Cave shaping")]
-    [Range(0f, 1f)] public float wallChance = 0.18f; // initial noise
+    
+    [Range(0f, 1f)] public float wallChance = 0.33f; // initial noise
     public int smoothIterations = 3;     // CA passes
     public int minBaseDistance = 12;    // tiles apart
     public int seed = 0;                              // 0 = random each run
@@ -30,7 +28,7 @@ public class ProceduralLevel : MonoBehaviour
     int[,] map;                                      // 0 floor / 1 wall
     readonly Color[] palette = { Color.red, Color.blue };
 
-    /* ------------------------------------------------------------------ */
+    
     void Awake() { Generate(); }
     void Update()
     {
@@ -38,7 +36,7 @@ public class ProceduralLevel : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    /* ===================  MAIN FLOW  =================== */
+    
     void Generate()
     {
         int runtimeSeed = (seed == 0) ? Random.Range(0, int.MaxValue) : seed;
@@ -50,10 +48,10 @@ public class ProceduralLevel : MonoBehaviour
 
         GenerateTileArray();   // cave layout
         InstantiateTiles();    // create floors & walls from sprites
-        PlaceFourBases();      // R, B, R, B
+        PlaceFourBases();      // Red, Blue, Red, Blue
     }
 
-    /* ---------- STEP 1: contiguous cave tiles ---------- */
+    
     void GenerateTileArray()
     {
         map = new int[width, height];
@@ -121,7 +119,7 @@ public class ProceduralLevel : MonoBehaviour
         }
     }
 
-    /* ---------- STEP 2: instantiate from sprites ---------- */
+    
     void InstantiateTiles()
     {
         for (int x = 0; x < width; x++)
@@ -141,6 +139,8 @@ public class ProceduralLevel : MonoBehaviour
         go.transform.position = pos;
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = floorSprite;
+        sr.sortingOrder = 1;
+
         return go;
     }
 
@@ -154,12 +154,17 @@ public class ProceduralLevel : MonoBehaviour
         var col = go.AddComponent<BoxCollider2D>();
         col.sharedMaterial = wallPhysicsMaterial;
         go.layer = LayerMask.NameToLayer("Walls");
+        sr.sortingOrder = 2;
+
         return go;
     }
 
-    /* ---------- STEP 3: spawn four bases (R,B,R,B) ---------- */
+    
     void PlaceFourBases()
     {
+        
+
+
         const int desiredBases = 4;
         List<Vector2Int> chosen = new();
         int tries = 0;
