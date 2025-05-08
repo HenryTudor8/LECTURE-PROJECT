@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class FlagScript : MonoBehaviour
 {
-    private LineRenderer lineRenderer; // Line Renderer to visualize flag movement
-    private Vector3 originalPosition;  // Stores the flag's initial position before dragging
-    private bool isDragging = false;   // Tracks whether the flag is currently being dragged
+    private LineRenderer lineRenderer; 
+    private Vector3 originalPosition;  
+    private bool isDragging = false;   
 
     void Start()
     {
         Debug.Log($"FlagScript Start() called for {gameObject.name}");
-        // Add this flag to the list of clickable objects in FlagController
+        
         FlagController.Instance.allClickableObjects.Add(gameObject);
         Debug.Log($"Flag added to allClickableObjects: {gameObject.name}, Color: {GetComponent<SpriteRenderer>().color}");
 
@@ -17,7 +17,7 @@ public class FlagScript : MonoBehaviour
         // Get the SpriteRenderer component
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
 
-        // Set sorting layer and ensure it appears in front of billions
+        
         sr.sortingLayerName = "Flags";
         sr.sortingOrder = 3; // Ensure flags render in front of billions
 
@@ -92,10 +92,10 @@ public class FlagScript : MonoBehaviour
         }
     }
 
-    /// <summary>
+    
     /// Ensures that exactly two flags of the same color exist.
     /// If there is only one, it spawns a second flag.
-    /// </summary>
+    
     private void EnsureTwoFlagsExist()
     {
         int flagCount = 0;  // Counter for how many flags of the same color exist
@@ -125,9 +125,9 @@ public class FlagScript : MonoBehaviour
         }
     }
 
-    /// <summary>
+    
     /// Finds the closest flag of the same color (excluding the current flag).
-    /// </summary>
+   
     /// <returns>The closest FlagScript instance of the same color.</returns>
     private FlagScript GetClosestFlagOfSameColor()
     {
