@@ -10,6 +10,7 @@ public class Billions : MonoBehaviour
     public int rank;
     public float currentHealth;
     public float blasterDamage;
+    public float maxHealth;
 
     /* ───────── Existing fields (unchanged) ───────── */
     private SpriteRenderer spriteRenderer;
@@ -28,6 +29,7 @@ public class Billions : MonoBehaviour
     private Color myColor;
     private float shootTimer;
     private GameObject currentTarget;
+    private Transform healthCircle;
 
     /* ───────── INITIALISE ───────── */
     public void Initialize(Color color, BillionaireBase myBase)
@@ -37,13 +39,32 @@ public class Billions : MonoBehaviour
 
         ownerBase = myBase;
         rank = myBase.rank;
-
+        maxHealth = 20;
         currentHealth = rank * 2.5f;      // formula from spec
         blasterDamage = rank * 0.5f;
         myColor = color;
+        
+        healthCircle = transform.Find("HealthCircle");
+        UpdateHealthVisual();
     }
 
-    /* ───────── FixedUpdate (movement / aim / shoot) ───────── */
+    private void UpdateHealthVisual() // HEALTH CIRCLE CHECKPOINT 4
+    {
+        if (healthCircle == null) return;
+
+        float minScale = 1.5f;
+        float maxScale = 3f;
+        float t = Mathf.Clamp01(currentHealth / maxHealth);
+        float scaled = Mathf.Lerp(minScale, maxScale, t);
+
+        healthCircle.localScale = new Vector3(scaled, scaled, 1f);
+        Debug.Log($"Billion HP: {currentHealth} → Scale: {scaled:F2}");
+
+    }
+
+
+
+
     void FixedUpdate()
     {
         FlagScript flag = FindNearestFlagOfSameColor();
@@ -57,7 +78,7 @@ public class Billions : MonoBehaviour
         TryShootAtTarget();
     }
 
-    /* ───────── Targeting helpers (unchanged logic + null guards) ───────── */
+    
     private void FindClosestTarget()
     {
         float closest = Mathf.Infinity;
@@ -121,7 +142,11 @@ public class Billions : MonoBehaviour
     /* ───────── Damage ───────── */
     public bool TakeDamage(float amount)
     {
+        Debug.Log($"{gameObject.name} took {amount} damage → HP now {currentHealth}");
+
         currentHealth -= amount;
+        UpdateHealthVisual();
+
         if (currentHealth <= 0f)
         {
             Destroy(gameObject);

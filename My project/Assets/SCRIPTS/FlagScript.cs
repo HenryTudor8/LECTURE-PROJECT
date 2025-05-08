@@ -45,19 +45,28 @@ public class FlagScript : MonoBehaviour
 
     void OnMouseDrag()
     {
-        if (isDragging)
-        {
-            // Get the current mouse position and convert it to world coordinates
-            Vector3 newPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            newPosition.z = 0;  // Keep flag in 2D space
-            //Debug.Log("Final mouse world position: " + finalPosition);
-            //Debug.Log("Moving flag to: " + closestFlag.transform.position);
+        Debug.Log($"[Drag] Dragging flag: {gameObject.name}");
 
-            // Update the line renderer positions to create a visual indicator
-            lineRenderer.SetPosition(0, originalPosition); // Line starts from original position
-            lineRenderer.SetPosition(1, newPosition);      // Line ends at the current mouse position
+        if (lineRenderer == null)
+        {
+            lineRenderer = GetComponent<LineRenderer>() ?? gameObject.AddComponent<LineRenderer>();
+            lineRenderer.useWorldSpace = true;
+            lineRenderer.positionCount = 2;
+            lineRenderer.startWidth = 0.05f;
+            lineRenderer.endWidth = 0.05f;
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            lineRenderer.startColor = Color.white;
+            lineRenderer.endColor = Color.white;
+            lineRenderer.sortingOrder = 10;
         }
+
+        Vector3 currentMouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        currentMouse.z = 0;
+
+        lineRenderer.SetPosition(0, originalPosition);
+        lineRenderer.SetPosition(1, currentMouse);
     }
+
 
     void OnMouseUp()
     {
